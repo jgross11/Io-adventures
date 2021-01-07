@@ -119,19 +119,3 @@ LinkedList printContents := method(
         "" println
     )
 )
-
-# WIP testing while testing framework is built
-
-list := LinkedList clone
-list add(0)
-list add(1)
-for(i, 1, 20, 
-    list addAtIndex(2, i)
-    list printContents
-)
-for(i, 1, 20, 
-    list removeAtIndex(2)
-    list printContents
-)
-list removeAtIndex(0)
-list printContents
