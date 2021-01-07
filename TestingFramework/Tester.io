@@ -133,13 +133,14 @@ Tester forward := method(
     successfulTests = successfulTests + successfulTestsInSuite
 
     # print suite results
-    "Results: #{successfulTestsInSuite} tests passed out of #{numberOfTestsInSuite} total = #{(successfulTestsInSuite/numberOfTestsInSuite) asString exSlice(0, 5)}% of tests passed" interpolate println
+    "Results: #{successfulTestsInSuite} tests passed out of #{numberOfTestsInSuite} total = #{(successfulTestsInSuite/numberOfTestsInSuite*100) asString exSlice(0, 5)}% of tests passed" interpolate println
     
     # print total results (so far)
-    "Overall, #{successfulTests} tests passed out of #{numberOfTests} total = #{(successfulTests/numberOfTests) asString exSlice(0, 5)}% of tests passed" interpolate println
+    "Overall, #{successfulTests} tests passed out of #{numberOfTests} total = #{(successfulTests/numberOfTests*100) asString exSlice(0, 5)}% of tests passed" interpolate println
     "\n#####################################################\n\tFinished running test #{call message name}\n#####################################################\n" interpolate println
 )
 
+/*
 # instance of tester
 tester := Tester clone
 
@@ -156,3 +157,4 @@ tester testSubtract(
     assertTrue(1 == 2),
     assertEquals(1, 1)
 )
+*/
