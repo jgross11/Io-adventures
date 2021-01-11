@@ -34,10 +34,12 @@ LinkedList add := method(value,
 
 # remove the node at the given index, squeezing the two bordering nodes together
 LinkedList removeAtIndex := method(index, 
-
     # if the index is invalid, throw error indicating invalid index, and valid index range
-    if(index < 0 or index > size) then(
-        Exception raise("Invalid index: #{index}\n\tValid indices: [0, #{size}]" interpolate)
+    if(index < 0 or index >= size) then(
+        errorString := nil
+        if(size > 0)then(errorString = "Valid indices: [0, #{size}]" interpolate)else(errorString = "List is empty!")
+        Exception raise("LinkedList: Invalid index when attempting to remove from index #{index}: #{errorString}" interpolate)
+        return 
     )
 
     # if the first node is being removed
@@ -47,7 +49,6 @@ LinkedList removeAtIndex := method(index,
         firstNode = firstNode nextNode
         // delete OG node if necessary?
     ) else(
-
         # otherwise, iterate to node before node to delete
         currentNode := firstNode
         for(i, 0, index - 2, 
@@ -58,7 +59,6 @@ LinkedList removeAtIndex := method(index,
         currentNode setNextNode(currentNode nextNode nextNode)
         // delete next node if necessary?
     )
-
     // decrement list size
     size = size - 1
 )
@@ -68,7 +68,9 @@ LinkedList addAtIndex := method(index, value,
 
     # if the index is invalid, throw error indicating invalid index, and valid index range 
     if(index < 0 or index > size) then(
-        Exception raise("Invalid index: #{index}\n\tValid indices: [0, #{size}]" interpolate)
+        errorString := nil
+        if(size > 0)then(errorString = "Valid indices: [0, #{size}]" interpolate)else(errorString = "List is empty!")
+        Exception raise("LinkedList: Invalid index when attempting to add item at index #{index}: #{errorString}" interpolate)
     )
 
     # create node to add
@@ -117,5 +119,24 @@ LinkedList printContents := method(
             currentNode = currentNode nextNode
         )
         "" println
+    )
+)
+
+LinkedList get := method(index, 
+    
+    # if the index is invalid, throw error indicating invalid index, and valid index range 
+    if(index < 0 or index >= size) then(
+        "Getting ERROR" println
+        Exception raise("Invalid index: #{index}\n\tValid indices: [0, #{size})" interpolate)
+    ) else(
+        
+        # otherwise, travel to node at the specified index
+        currentNode := firstNode
+        for(i, 0, index - 1, 
+            currentNode = currentNode nextNode
+        )
+
+        # and return its value
+        return currentNode value
     )
 )
