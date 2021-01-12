@@ -1,10 +1,13 @@
 # object that sets up testing environment
 # upon initial creation (NOT initialization)
-# do all this stuff
+
 Tester := Object clone do(
+
     # init number of total / successful tests ran
     numberOfTests := 0
     successfulTests := 0
+
+    # init number of total / successful tests in a method's suite
     numberOfTestsInSuite := 0
     successfulTestsInSuite := 0
 
@@ -16,26 +19,16 @@ Tester := Object clone do(
     # by default, stop running test upon test fail
     stopOnFail ::= true
 
+    # init map of tests 
     tests := Map clone
+
+    # default test name
     testName ::= "Unnamed Test"
-)
-
-# TODO allll of these methods need to be moved to be usable without the tester object (their own file)
-# TODO don't be lazy. 
-
-# used when running tests to determine if a successful test's information should be printed
-Tester shouldPrintSuccesses := method(
-    return printSuccesses
-)
-
-# used when running tests to determine if a failed test's information should be printed
-Tester shouldPrintFailures := method(
-    return printFailures
 )
 
 # used when running tests to print a summary of the tests that have been ran
 Tester printTestSummary := method(
-    # print suite results
+    # print header
     "\n##########################################################################" println
     "############################ Test Summary ################################" println
     "##########################################################################" println
@@ -92,12 +85,6 @@ Object assertEquals := method(obj1, obj2,
     )
 )
 
-Tester setInitialParameters := method(suc, fail, stop, 
-    Tester printSuccesses = suc
-    Tester printFailures = fail
-    Tester stopOnFail = stop
-)
-
 # custom forward definition that allows for tidy testing format of form
 
 /*
@@ -125,66 +112,59 @@ Tester setInitialParameters := method(suc, fail, stop,
 
 Tester forward := method(
 
-    // TODO make forward add tests to Tester tests map
-    // TODO Tester executeTests will actually run the tests.
-
+    # test name is missing method's name
     testName := call message name
+
+    # reference to this specific method's test list
     testList := nil
+
+    # if method's test list already exists
+    # get a reference to it
     if(tests hasKey(testName))then(
         testList = tests at(testName)
+
+    # otherwise, put the new method's name in the map
     )else(
+
+        # with the name as key, a new list as value
         tests atPut(testName, List clone)
+
+        # and get a reference to the newly created list
         testList = tests at(testName)
     )
+
+    # for each test for this method
     call message arguments foreach(index, arg, 
+        
+        # add each test to execute to this list
         testList append(arg)
+
+        # increment number of tests in this Test
         numberOfTests = numberOfTests + 1
     )
-
-    ##### TODO currently in the process of transferring old forward method to new one wherein map is created where test name is key, tests to run are contained in list that is map value #####
-
-    /*
-
-    # if a before method is defined, call it 
-    if(Object getSlot("before") != nil) then(Object before) else("No before method found! If stuff needs to happen before each test, must include: \nObject before := method(/*stuff to do before running test here*/)" println)
-
-    "\n#####################################################\n\tRunning test #{call message name}\n#####################################################\n" interpolate println
-    
-    # number of tests in this suite, disguised as # of params in function call
-    numberOfTestsInSuite := call message arguments size
-
-    # number of successful tests in this suite
-    successfulTestsInSuite := 0
-
-    # for each parameter
-    call message arguments foreach(index, arg, 
-
-        # run the test - if it passes, one will be returned by evalArgAt, otherwise, 0 is returned
-        successfulTestsInSuite = successfulTestsInSuite + call evalArgAt(index)
-    )
-
-    # add number of tests in this suite to total amount
-    numberOfTests = numberOfTests + numberOfTestsInSuite
-
-    # add number of successful tests in this suite to total amount
-    successfulTests = successfulTests + successfulTestsInSuite
-
-    # print suite results
-    "\nResults: #{successfulTestsInSuite} tests passed out of #{numberOfTestsInSuite} total = #{(successfulTestsInSuite/numberOfTestsInSuite*100) asString exSlice(0, 5)}% of tests passed" interpolate println
-
-    */
 )
 
+# actually executes every test in the tests map
 Tester executeTests := method(
     
+    # print big header
     "\n##########################################################################\n\t\tRunning tests for #{testName}\n##########################################################################\n" interpolate println
+    
+    # for every method that has tests to run
     tests keys foreach(key,
+
+        # if before work needs to be done
         if(Object getSlot("before") != nil) then(
+            
+            # execute it
             Object before
         ) else(
-            "No before method found! If stuff needs to happen before each test, must include: \nObject before := method(/*stuff to do before running test here*/)" println
+
+            # otherwise, notify user that they can do so if need be
+            "No before method found! If stuff needs to happen before each test, must include: \nObject before := method(/*stuff to do before running test here*/) in Test[Thing] file" println
         )
         
+        # print test header
         "\n#####################################################\n\tRunning test #{key}\n#####################################################\n" interpolate println
         
         # number of tests in this suite, disguised as # of elements in tests map value list size
@@ -198,13 +178,29 @@ Tester executeTests := method(
 
             # run the test - if it passes, one will be returned by doMessage, otherwise, 0 is returned
             e := try(successfulTestsInSuite = successfulTestsInSuite + doMessage(arg))
+            
+            # if an exception is caught, then a test created it
             e catch(
-                "\nCaught exception from test: " println
-                e showStack
+
+                # if test failures are to be printed
+                if(printFailures)then(
+
+                    # print the exception that arose from test
+                    "\nCaught exception from test: " println
+                    e showStack
+                )
                 
-                # TODO determine if error messaging can all be lumped here, as opposed to in assertX methods...
+                # if a test failure should result in the stopping of running tests
                 if(stopOnFail)then(
+
+                    # add number of successful tests in this suite to total amount
+                    # still need to do this as a successful test may have happened before failure in this suite
+                    successfulTests = successfulTests + successfulTestsInSuite
+
+                    # print test summary in the current state
                     Tester printTestSummary
+
+                    # raise exception to stop testing
                     Exception raise("### Stopping due to test failure - use Tester setStopOnFail(false) to continue running tests when a test fails ###")
                 )
             )
@@ -219,5 +215,6 @@ Tester executeTests := method(
         )
     )
 
+    # after all tests have ran, print the final summary
     Tester printTestSummary
 )
