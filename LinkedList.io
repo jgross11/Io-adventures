@@ -108,6 +108,31 @@ LinkedList addAtIndex := method(index, value,
     size = size + 1
 )
 
+# iterates through list, checking each node to see if the parameter value is in the list
+# returns the index of the value if it is in list, -1 otherwise
+LinkedList indexOf := method(value, 
+
+    currentNode := firstNode
+
+    # for every node in list
+    for(i, 0, size-1, 
+
+        # if the current node's value is the value we desire
+        if(currentNode value == value)then(
+
+            # return index of this node
+            return i
+
+        # otherwise, move to next node
+        ) else(
+            currentNode = currentNode nextNode
+        )
+    )
+
+    # reached end of list without finding value, return -1
+    return -1
+)
+
 # iterate through list, printing each element's index and value
 # also prints current size of list
 LinkedList printContents := method(
@@ -126,8 +151,9 @@ LinkedList get := method(index,
     
     # if the index is invalid, throw error indicating invalid index, and valid index range 
     if(index < 0 or index >= size) then(
-        "Getting ERROR" println
-        Exception raise("Invalid index: #{index}\n\tValid indices: [0, #{size})" interpolate)
+        errorString := nil
+        if(size > 0)then(errorString = "Valid indices: [0, #{size}]" interpolate)else(errorString = "List is empty!")
+        Exception raise("LinkedList: Invalid index when attempting to get item at index #{index}: #{errorString}" interpolate)
     ) else(
         
         # otherwise, travel to node at the specified index
