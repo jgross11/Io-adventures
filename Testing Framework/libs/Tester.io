@@ -156,8 +156,17 @@ Tester executeTests := method(
         # if before work needs to be done
         if(Object getSlot("before") != nil) then(
             
-            # execute it
-            Object before
+            # try to execute before method
+            e := try(Object before)
+            e catch(
+                # if test failures are to be printed
+                if(printFailures)then(
+
+                    # print the exception that arose from test
+                    "\nCaught exception from before work: " println
+                    e showStack
+                )
+            )
         ) else(
 
             # otherwise, notify user that they can do so if need be
