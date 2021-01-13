@@ -7,19 +7,38 @@
 
 // best?
 // add each path in the current directory 
+/*
 Directory directories foreach(dir, 
     Importer addSearchPath(dir path)
 )
+*/
 
-// determines which statements to print
-Tester setPrintSuccesses(false)
-Tester setPrintFailures(true)
+// if launched from the command line (an individual is testing), use user Tester settings
+// otherwise keep Tester defaults
+if(isLaunchScript)then(
+    
+    // determines which statements to print
+    Tester setPrintSuccesses(false)
+    Tester setPrintFailures(true)
 
-// determines if test should stop running upon encountering a failure
-Tester setStopOnFail(false)
+    // determines if test should stop running upon encountering a failure
+    Tester setStopOnFail(false)
 
-// determines if each method's test results should print
-Tester setPrintIndividualTestResults(false)
+    // determines if each method's test results should print
+    Tester setPrintIndividualTestResults(false)
+
+// otherwise, running test collection, use convenience settings
+) else(
+    // determines which statements to print
+    Tester setPrintSuccesses(true)
+    Tester setPrintFailures(true)
+
+    // determines if test should stop running upon encountering a failure
+    Tester setStopOnFail(false)
+
+    // determines if each method's test results should print
+    Tester setPrintIndividualTestResults(true)
+)
 
 // formats header print statement
 Tester setTestName("Linked List")
