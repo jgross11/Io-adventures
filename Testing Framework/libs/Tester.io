@@ -218,3 +218,10 @@ Tester executeTests := method(
     # after all tests have ran, print the final summary
     Tester printTestSummary
 )
+
+Tester resetStats := method(
+    successfulTests = 0
+    successfulTestsInSuite = 0
+    numberOfTests = 0
+    numberOfTestsInSuite = 0
+)
